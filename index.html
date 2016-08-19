@@ -3,85 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Code Contas</title>
-    <style type="text/css">
-        .pago {
-            color:green;
-        }
-        .nao-pago {
-            color:red;
-        }
-        .nenhuma-conta-a-pagar {
-            color:green;
-        }
-        .conta-a-pagar {
-            color:red;
-        }
-        .nenhuma-conta-cadastrada {
-            color:grey;
-        }
-    </style>
+
 </head>
 <body id="app">
-
-<h1>{{title}}</h1>
-<h3 :class="{'conta-a-pagar': status, 'nenhuma-conta-a-pagar':!status, 'nenhuma-conta-cadastrada':bills.length == 0}">
-    {{status | statusLabel}}
-</h3>
-<nav>
-    <ul>
-        <li v-for="o in menus">
-        <a href="#" @click.prevent="showView(o.id)">{{o.name}}</a></li>
-
-    </ul>
-</nav>
-<div v-if="activedView == 0">
-     <table border="1" cellpadding="10">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Vecimento</th>
-            <th>Nome</th>
-            <th>Valor</th>
-            <th>Paga?</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(index,o) in bills">
-                <td>{{index}}</td>
-                <td>{{o.date_due}}</td>
-                <td>{{o.name}}</td>
-                <td>{{o.value | currency 'R$ ' 2 }}</td>
-                <td :class="{'pago': o.done, 'nao-pago':!o.done}">
-                    {{o.done | doneLabel}}
-                </td>
-                <td>
-                    <a href="#" @click.prevent="loadBill(o)">Editar</a> |
-                    <a href="#" @click.prevent="deleteBill(index)">Excluir</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-<div v-if="activedView==1">
-    <form name="form" @submit.prevent="submit">
-        <label>Vencimento:</label>
-        <input type="Text" v-model="bill.date_due"/>
-        <br/><br/>
-        <label>Nome:</label>
-        <select v-model="bill.name">
-            <option v-for="o in names" :value="o">{{o}}</option>
-        </select>
-        <br/><br/>
-        <label>Valor:</label>
-        <input type="Text" v-model="bill.value"/>
-        <br/><br/>
-        <label>Paga</label>
-        <input type="checkbox" v-model="bill.done">
-        <br/><br/>
-        <input type="submit" value="enviar"/>
-
-    </form>
+<app-component></app-component>
 </div>
 <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
 <script type="text/javascript" src="filters.js"></script>

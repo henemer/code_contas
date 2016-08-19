@@ -1,5 +1,5 @@
 Vue.filter('statusLabel', function(count) {
-    if ((this.bills.length) == 0 ) {
+    if (count == -1) {
         return "Nenhuma conta cadastrada";
     }
     return !count?"Nenhuma conta a pagar":"Existem "+count + " contas a serem pagas";

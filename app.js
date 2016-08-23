@@ -18,20 +18,29 @@ var menuComponent = Vue.extend({
     },
     methods: {
         showView: function(id) {
-            this.$parent.activedView = id;
+
+            this.$dispatch('change-activedview', id);
             if(id==1) {
-                this.$parent.formType = 'insert';
+                this.$dispatch('change-formtype','insert');
             }
 
         }
     }
 });
-Vue.component('menu-component', menuComponent);
-
 
 var billListComponent = Vue.extend({
     template: `
          <style type="text/css">
+                .nenhuma-conta-a-pagar {
+                    color:green;
+                }
+                .conta-a-pagar {
+                    color:red;
+                }
+                .nenhuma-conta-cadastrada {
+                    color:grey;
+                }
+
                 .pago {
                     color:green;
                 }
@@ -84,53 +93,37 @@ var billListComponent = Vue.extend({
     },
     methods: {
         loadBill:function(bill) {
-            this.bill = bill;
-            this.$parent.activedView = 1;
-            this.$parent.formType = 'update';
+            this.$dispatch('change-bill', bill);
+            this.$dispatch('change-activedview', 1);
+            this.$dispatch('change-formType','update');
         },
         deleteBill:function(bill) {
             if (confirm('Confirma a exclusão da conta ?')) {
                 this.bills.$remove(bill);
             }
         }
+    },
+    events: {
+        'new-bill': function(bill) {
+            this.bills.push(bill);
+        }
+
     }
 });
-Vue.component('bill-list-component', billListComponent);
 
-var appComponent = Vue.extend({
-    template:`
-       <style type="text/css">
-            .nenhuma-conta-a-pagar {
-                color:green;
-            }
-            .conta-a-pagar {
-                color:red;
-            }
-            .nenhuma-conta-cadastrada {
-                color:grey;
-            }
-        </style>
-        <h1>{{title}}</h1>
-        <h3 :class="{'conta-a-pagar': status, 'nenhuma-conta-a-pagar':!status, 'nenhuma-conta-cadastrada':bills.length == 0}">
-            {{status | statusLabel}}
-        </h3>
-        <menu-component></menu-component>
-        <div v-if="activedView == 0">
-            <bill-list-component></bill-list-component>
-
-        </div>
-            <div v-if="activedView==1">
-            <form name="form" @submit.prevent="submit">
+var billCreateComponent = Vue.extend({
+    template: `
+        <form name="form" @submit.prevent="submit">
             <label>Vencimento:</label>
-        <input type="Text" v-model="bill.date_due"/>
+            <input type="Text" v-model="bill.date_due"/>
             <br/><br/>
             <label>Nome:</label>
-        <select v-model="bill.name">
+            <select v-model="bill.name">
             <option v-for="o in names" :value="o">{{o}}</option>
-        </select>
-        <br/><br/>
-        <label>Valor:</label>
-        <input type="Text" v-model="bill.value"/>
+            </select>
+            <br/><br/>
+            <label>Valor:</label>
+            <input type="Text" v-model="bill.value"/>
             <br/><br/>
             <label>Paga</label>
             <input type="checkbox" v-model="bill.done">
@@ -140,48 +133,29 @@ var appComponent = Vue.extend({
         </form>
     `,
     data:function() {
-       return {
-           title:"Contas a pagar",
-               activedView:0,
-               formType:'insert',
-               bill: {
-               date_due: '',
-                   name:'',
-                   value:0,
-                   done:false
-           },
-           names: [
-               'Conta de luz',
-               'Conta de água',
-               'Conta de telefone',
-               'Supermercado',
-               'Cartão de crédito',
-               'Empréstimo',
-               'Gasolina'
-           ],
-       };
-    },
-    computed: {
-        status:function() {
-            var count = 0;
-
-            if(this.bills.length == 0) {
-                return -1;
+        return {
+            formType:'insert',
+            names: [
+                'Conta de luz',
+                'Conta de água',
+                'Conta de telefone',
+                'Supermercado',
+                'Cartão de crédito',
+                'Empréstimo',
+                'Gasolina'
+            ],
+            bill: {
+            date_due: '',
+            name: '',
+            value: 0,
+            done: false
             }
-
-            for (var i in this.bills) {
-                if(!this.bills[i].done) {
-                    count++;
-                }
-            }
-            return count;
-        }
+        };
     },
-
     methods: {
         submit:function() {
             if(this.formType=='insert') {
-                this.bills.push(this.bill);
+                this.$dispatch('new-bill', this.bill);
             }
 
             this.bill =  {
@@ -190,8 +164,97 @@ var appComponent = Vue.extend({
                 value:0,
                 done:false
             };
-            this.activedView = 0;
+
+            this.$dispatch('change-activedview', 0);
+
         }
+    },
+    events: {
+        'change-formtype': function(formType) {
+            this.formType = formType;
+        },
+        'change-bill':function(bill) {
+            this.bill = bill;
+        }
+
+    }
+
+});
+
+var appComponent = Vue.extend({
+    components: {
+        'menu-component': menuComponent,
+        'bill-list-component': billListComponent,
+        'bill-create-component':billCreateComponent
+    },
+    template:`
+       <style type="text/css">
+                .nenhuma-conta-a-pagar {
+                    color:green;
+                }
+                .conta-a-pagar {
+                    color:red;
+                }
+                .nenhuma-conta-cadastrada {
+                    color:grey;
+                }
+
+        </style>
+        <h1>{{title}}</h1>
+        <h3 :class="{'conta-a-pagar': status >0, 'nenhuma-conta-a-pagar':status ==0, 'nenhuma-conta-cadastrada':status == -1}">
+            {{status | statusLabel}}
+        </h3>
+        <menu-component></menu-component>
+        <div v-show="activedView == 0">
+            <bill-list-component v-ref:bill-list-component></bill-list-component>
+
+       </div>
+       <div v-show="activedView==1">
+        <bill-create-component :bill.sync="bill"></bill-create-component>
+       </div> 
+           
+    `,
+    data:function() {
+       return {
+           title:"Contas a pagar",
+               activedView:0
+       };
+    },
+    computed: {
+        status:function() {
+            var count = 0;
+            var billListComponent = this.$refs.billListComponent;
+
+            if(billListComponent.bills.length == 0) {
+                return -1;
+            }
+
+            for (var i in billListComponent.bills) {
+                if(!billListComponent.bills[i].done) {
+                    count++;
+                }
+            }
+            return count;
+        }
+    },
+
+    methods: {
+    },
+    events: {
+        'change-activedview': function(activedView) {
+            this.activedView = activedView;
+        },
+        'change-formtype': function(formType) {
+            this.$broadcast('change-formtype', formType);
+        },
+        'change-bill':function(bill) {
+            this.$broadcast('change-bill', bill);
+        },
+        'new-bill': function(bill) {
+            this.$broadcast('new-bill', bill);
+        }
+
+
     }
 
 });

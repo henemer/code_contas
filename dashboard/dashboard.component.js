@@ -13,36 +13,22 @@ window.dashboardComponent = Vue.extend({
     `,
     data:function() {
         return {
-            title:"Dashboard"
+            title:"Dashboard",
+            totalAPagar:0,
+            totalAReceber:0
         };
     },
-    computed: {
-        totalAPagar:function() {
-            var bills = this.$root.$children[0].billsPay;
-            var total  = 0;
-
-            for (var i in bills) {
-                if(!bills[i].done) {
-                    total += bills[i].value
-
-                }
-            }
-            return total;
-        },
-        totalAReceber:function() {
-            var bills = this.$root.$children[0].billsReceive;
-            var total  = 0;
-
-            for (var i in bills) {
-                if(!bills[i].done) {
-                    total += bills[i].value
-
-                }
-            }
-            return total;
-        }
-
+    created:function() {
+        self = this;
+        Bill.total().then(function (response) {
+            console.log(response.data.total);
+            self.totalAPagar =  parseFloat(response.data.total);
+        });
+        BillR.total().then(function (response) {
+            self.totalAReceber =  response.data.total;
+        });
     }
+
 
 
 });

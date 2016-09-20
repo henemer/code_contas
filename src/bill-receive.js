@@ -1,0 +1,3 @@
+class BillReceive extends BillPay {
+
+};

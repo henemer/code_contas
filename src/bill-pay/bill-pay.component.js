@@ -20,33 +20,33 @@ window.billPayComponent = Vue.extend({
             {{status | statusLabelPay}}
         </h3>
         
-        <h3> {{ total | currency 'R$ '}}</h3>
+        <h3> {{ total | numberFormat 'pt-BR'}}</h3>
         <bill-pay-menu-component></bill-pay-menu-component>
         <router-view></router-view>
            
     `,
 
-    data:function() {
+    data() {
         return {
             title:"Contas a pagar",
             status: -1,
             total:0
         };
     },
-    created:function() {
+    created() {
         this.updateStatus();
         this.updateTotal();
     },
     methods: {
-        calculateStatus:function(bills) {
-            var count = 0;
+        calculateStatus(bills) {
+            let count = 0;
 
             if(bills.length == 0) {
                 this.status = -1;
                 return;
             }
 
-            for (var i in bills) {
+            for (let i in bills) {
                 if(!bills[i].done) {
                     count++;
                 }
@@ -54,22 +54,18 @@ window.billPayComponent = Vue.extend({
             this.status = count;
 
         },
-        updateStatus:function() {
-            var self = this;
-            Bill.query().then(function(response){
-                self.calculateStatus(response.data);
-            });
+        updateStatus() {
+            Bill.query().then((response) => this.calculateStatus(response.data));
         },
-        updateTotal:function() {
-            var self = this;
-            Bill.total().then(function(response){
-                self.total  = response.data.total;
+        updateTotal() {
+            Bill.total().then((response)=>{
+                this.total  = response.data.total;
             });
 
         }
     },
     events: {
-        'change-info': function(){
+        'change-info'(){
             this.updateStatus();
             this.updateTotal();
         }

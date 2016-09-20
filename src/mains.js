@@ -1,6 +1,6 @@
 
 
-var router  = new VueRouter();
+let router  = new VueRouter();
 
 router.map({
     '/': {
@@ -44,7 +44,6 @@ router.map({
     '*': { // Rota padrão
         component: dashboardComponent
     }
-
 
 
 });

@@ -57,15 +57,7 @@ window.billReceiveCreateComponent = Vue.extend({
         getBill(id) {
             BillR.get({id:id}).then((response) =>{
                 this.bill = new BillReceive(response.data);
-                this.bill.date_due = this.getDateDue(this.bill.date_due);
             });
         },
-        getDateDue(dateDue) {
-            let dateDueObject =  dateDue;
-            if(!(dateDue instanceof Date)) {
-                dataDueObject = new Date(date_due.split('/').reverse().join('-') + "T03:00:00");
-            }
-            return dateDueObject.toISOString().split('T')[0];
-        }
     }
 });

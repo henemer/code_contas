@@ -1,0 +1,25 @@
+$primary-color: color('teal', 'darken-3');
+$secondary-color: color('teal', 'base');
+
+/* Toasts
+  ========================================================================== */
+
+$toast-height: 65px;
+$toast-color: red ;
+
+
+/* Forms
+   ========================================================================== */
+
+$input-border-color: color("green", "base");
+$input-border: 2px solid $input-border-color;
+$input-background: #fff !default;
+
+
+
+// Minhas classes.
+
+.my-modal {
+  @extend .modal;
+  width: 45% !important;
+}

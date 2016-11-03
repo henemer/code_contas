@@ -105,7 +105,7 @@ $app->get('api/bills/{id}', function ($id) use ($app) {
 
 $app->get('api/billsr/{id}', function ($id) use ($app) {
     $bills = getBillsR();
-    $bill = $bills[findIndexById($id)];
+    $bill = $bills[findIndexByIdR($id)];
     return $app->json($bill);
 });
 
@@ -140,7 +140,7 @@ $app->put('api/bills/{id}', function (Request $request, $id) use ($app) {
 $app->put('api/billsr/{id}', function (Request $request, $id) use ($app) {
     $bills = getBillsR();
     $data = $request->request->all();
-    $index = findIndexById($id);
+    $index = findIndexByIdR($id);
     $bills[$index] = $data;
     $bills[$index]['id'] = (int)$id;
     writeBillsR($bills);
